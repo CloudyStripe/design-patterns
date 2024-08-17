@@ -1,64 +1,122 @@
 
 
 interface IShippingInformation {
-    sender: string,
-    recipient: string,
-    shippingId: number
+    shippingInformation: {
+        sender: string,
+        recipient: string,
+        shippingId: number
+    }
 }
 
 //Abstract Factory Interface
-
 interface IShippingFactory {
-    accountingEngine(miles: number): number
-    labelingEngine(sender: string, recipient: string, shippingId: number): ILabel | InternationalLabel
+    createAccountingEngine(): IAccountingEngine | IInternationalAccountingEngine
+    createLabelingEngine(): ILabelEngine | IInternationalLabelEngine
+}
+
+//Abstract Product
+interface IAccountingEngine {
+    calculateCost(miles: number, baseRate: number): {
+        cost: number
+    }
+}
+
+interface IInternationalAccountingEngine {
+    calculateCost(miles: number, baseRate: number, customsFee: number, internationalHandling: number): {
+        cost: number
+    }
 }
 
 //Abstract Product
 
-interface ILabel {
-    shippingInformation: IShippingInformation
+interface ILabelEngine {
+    generateLabel(sender: string, recipient: string, shippingId: number): IShippingInformation
 }
 
-//Abstract Product
-
-interface InternationalLabel extends ILabel {
-    customs: number
+interface IInternationalLabelEngine {
+    generateLabel(sender: string, recipient: string, shippingId: number, customsFee: number): IShippingInformation & {
+        customsFee: number
+    }
 }
+
+//Concrete Factory
 
 class DomesticShippingFactory implements IShippingFactory {
 
-    accountingEngine(miles: number): number {
-        return 5
+    createAccountingEngine(): IAccountingEngine {
+        return new AccountingEngine()
     }
 
-    labelingEngine(sender: string, recipient: string, shippingId: number): ILabel {
+    createLabelingEngine(): ILabelEngine {
+        return new LabelEngine()
+    }
+}
+
+//Concrete Factory
+
+class InternationalShippingFactory implements IShippingFactory {
+
+    createAccountingEngine(): IInternationalAccountingEngine {
+        return new InternationalAccountingEngine()
+    }
+
+    createLabelingEngine(): IInternationalLabelEngine {
+        return new InternationalLabelEngine()
+    }
+}
+
+//Concrete Product (Accounting Engines)
+
+class AccountingEngine implements IAccountingEngine {
+
+    calculateCost(miles: number, baseRate: number): { cost: number } {
+        const cost = miles * baseRate
+        return {
+            cost
+        }
+    }
+
+}
+
+class InternationalAccountingEngine implements IInternationalAccountingEngine {
+
+    calculateCost(miles: number, baseRate: number, customsFee: number, internationalHandling: number): { cost: number } {
+        const cost = (miles * baseRate) + customsFee + internationalHandling
+        return {
+            cost
+        }
+    }
+
+}
+
+//Concrete Product (Labeling Engines)
+
+class LabelEngine implements ILabelEngine {
+    generateLabel(sender: string, recipient: string, shippingId: number): IShippingInformation {
         return {
             shippingInformation: {
-                sender: sender,
-                recipient: recipient,
-                shippingId: shippingId
+                sender,
+                recipient,
+                shippingId
             }
         }
     }
 }
 
-class InternationalShippingFactory implements IShippingFactory {
-
-    accountingEngine(miles: number): number {
-        return 5
-    }
-
-    labelingEngine(sender: string, recipient: string, shippingId: number): InternationalLabel {
+class InternationalLabelEngine implements IInternationalLabelEngine {
+    generateLabel(sender: string, recipient: string, shippingId: number, customsFee: number): IShippingInformation & { customsFee: number } {
         return {
             shippingInformation: {
-                sender: sender,
-                recipient: recipient,
-                shippingId: shippingId,
+                sender,
+                recipient,
+                shippingId
             },
-            customs: 5
+            customsFee
         }
     }
 }
+
+
 
 
 //wouldn't make sense in smaller systems
