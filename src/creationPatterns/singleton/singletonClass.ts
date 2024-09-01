@@ -12,6 +12,10 @@ export class MasterLogger {
       return MasterLogger.instance;
     }
 
+    init = () => {
+      return new MasterLogger();
+    }
+
     log(message: string): void {
       this.pendingLogs.push(message);
       console.log(`Logged: ${message}`);
