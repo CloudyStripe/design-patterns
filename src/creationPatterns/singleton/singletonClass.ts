@@ -1,34 +1,31 @@
 export class MasterLogger {
-    static instance: MasterLogger;
-    private pendingLogs: string[];
+    private static instance: MasterLogger | null = null;
+    private pendingLogs: string[] = [];
   
     private constructor() {
-      this.pendingLogs = [];
-      if (!MasterLogger.instance) {
-        MasterLogger.instance = new MasterLogger();
-      }
-      
-      console.log('MasterLogger instance already created');
-      return MasterLogger.instance;
+        // Private constructor to prevent direct construction calls with the `new` operator.
     }
 
-    init = () => {
-      return new MasterLogger();
+    public static getInstance(): MasterLogger {
+        if (!MasterLogger.instance) {
+            MasterLogger.instance = new MasterLogger();
+        }
+        return MasterLogger.instance;
     }
 
-    log(message: string): void {
-      this.pendingLogs.push(message);
-      console.log(`Logged: ${message}`);
+    public log(message: string): void {
+        this.pendingLogs.push(message);
+        console.log(`Logged: ${message}`);
     }
   
-    sendLogs(): void {
-      if (this.pendingLogs.length === 0) {
-        console.log('No logs to send.');
-        return;
-      }
+    public sendLogs(): void {
+        if (this.pendingLogs.length === 0) {
+            console.log('No logs to send.');
+            return;
+        }
 
-      console.log('Sending logs:', this.pendingLogs);
+        console.log('Sending logs:', this.pendingLogs);
   
-      this.pendingLogs = [];
+        this.pendingLogs = [];
     }
 }
