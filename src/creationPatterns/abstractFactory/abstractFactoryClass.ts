@@ -8,90 +8,61 @@ interface IShippingInformation {
     }
 }
 
-//Abstract Factory Interface
+// Abstract Factory Interface
 interface IShippingFactory {
-    createAccountingEngine(): IAccountingEngine | IInternationalAccountingEngine
-    createLabelingEngine(): ILabelEngine | IInternationalLabelEngine
+    createAccountingEngine(): IAccountingEngine
+    createLabelingEngine(): ILabelEngine
 }
 
-//Abstract Product
+// Abstract Product Interfaces
 interface IAccountingEngine {
-    calculateCost(miles: number, baseRate: number): {
+    calculateCost(miles: number, baseRate: number, customsFee?: number, internationalHandling?: number): {
         cost: number
     }
 }
-
-interface IInternationalAccountingEngine {
-    calculateCost(miles: number, baseRate: number, customsFee: number, internationalHandling: number): {
-        cost: number
-    }
-}
-
-//Abstract Product
 
 interface ILabelEngine {
-    generateLabel(sender: string, recipient: string, shippingId: number): IShippingInformation
+    generateLabel(sender: string, recipient: string, shippingId: number, customsFee?: number): IShippingInformation
 }
 
-interface IInternationalLabelEngine {
-    generateLabel(sender: string, recipient: string, shippingId: number, customsFee: number): IShippingInformation & {
-        customsFee: number
-    }
-}
-
-//Concrete Factory
-
+// Concrete Factories
 class DomesticShippingFactory implements IShippingFactory {
-
     createAccountingEngine(): IAccountingEngine {
-        return new AccountingEngine()
+        return new DomesticAccountingEngine()
     }
 
     createLabelingEngine(): ILabelEngine {
-        return new LabelEngine()
+        return new DomesticLabelEngine()
     }
 }
 
-//Concrete Factory
-
 class InternationalShippingFactory implements IShippingFactory {
-
-    createAccountingEngine(): IInternationalAccountingEngine {
+    createAccountingEngine(): IAccountingEngine {
         return new InternationalAccountingEngine()
     }
 
-    createLabelingEngine(): IInternationalLabelEngine {
+    createLabelingEngine(): ILabelEngine {
         return new InternationalLabelEngine()
     }
 }
 
-//Concrete Product (Accounting Engines)
-
-class AccountingEngine implements IAccountingEngine {
-
+// Concrete Products (Accounting Engines)
+class DomesticAccountingEngine implements IAccountingEngine {
     calculateCost(miles: number, baseRate: number): { cost: number } {
         const cost = miles * baseRate
-        return {
-            cost
-        }
+        return { cost }
     }
-
 }
 
-class InternationalAccountingEngine implements IInternationalAccountingEngine {
-
+class InternationalAccountingEngine implements IAccountingEngine {
     calculateCost(miles: number, baseRate: number, customsFee: number, internationalHandling: number): { cost: number } {
         const cost = (miles * baseRate) + customsFee + internationalHandling
-        return {
-            cost
-        }
+        return { cost }
     }
-
 }
 
-//Concrete Product (Labeling Engines)
-
-class LabelEngine implements ILabelEngine {
+// Concrete Products (Labeling Engines)
+class DomesticLabelEngine implements ILabelEngine {
     generateLabel(sender: string, recipient: string, shippingId: number): IShippingInformation {
         return {
             shippingInformation: {
@@ -103,8 +74,8 @@ class LabelEngine implements ILabelEngine {
     }
 }
 
-class InternationalLabelEngine implements IInternationalLabelEngine {
-    generateLabel(sender: string, recipient: string, shippingId: number, customsFee: number): IShippingInformation & { customsFee: number } {
+class InternationalLabelEngine implements ILabelEngine {
+    generateLabel(sender: string, recipient: string, shippingId: number, customsFee: number): IShippingInformation {
         return {
             shippingInformation: {
                 sender,
@@ -112,18 +83,8 @@ class InternationalLabelEngine implements IInternationalLabelEngine {
                 shippingId
             },
             customsFee
-        }
+        } as IShippingInformation
     }
 }
 
-
-
-
-//wouldn't make sense in smaller systems
-
-
-
-
-
-
-
+// This pattern is particularly useful in larger systems with multiple product families
