@@ -1,6 +1,6 @@
 import { Crust, Cut, Sauce, Size, Topping, IPizza } from "./types"
 
-//Builder 
+//Builder Interface
 interface IPizzaBuilder {
     addTopping(topping: Topping): IPizzaBuilder
     setCrust(crust: Crust.THICK | Crust.THIN): IPizzaBuilder
@@ -11,7 +11,7 @@ interface IPizzaBuilder {
 }
 
 //Concrete Builder
-class PizzaOver implements IPizzaBuilder {
+class PizzaOven implements IPizzaBuilder {
     
     pendingOrder: IPizza
 
